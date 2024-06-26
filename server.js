@@ -16,7 +16,7 @@ const client = new pg.Client({
     password: 'Destripador123.',
     host: 'localhost',
     port: 5432,
-    database: 'world',
+    database: 'e-commerce',
   });
   
   client
@@ -28,21 +28,32 @@ const client = new pg.Client({
       console.error('Error connecting to PostgreSQL database', err);
   });
 
- 
+ app.get('/', (req, res) => {
+    res.sendStatus(200);
+ })
         
-app.get('/signup', async (req, res) => {
+app.post('/signup', async (req, res) => {
+    const name = req.body.name;
+    const password = req.body.password;
+    const email = req.body.email;
     try {
-        const result =  await client.query('SELECT * FROM public.capitals ORDER BY id ASC')
-        res.json(result.rows)
+        const result = await client.query('INSERT INTO  public.customers(name, email, password) VALUES ($1,$2,$3) RETURNING *;',[name, email ,password]);
+        res.json(result.rows);
     } catch (error) {
-        console.error('Problem executing select all, error: ', error)
+        console.error('Problem executing signup, error: ', error);
     }
 
 })
 
 app.post('/login', async (req, res) => {
- 
-
+    const email = req.body.email;
+    const password = req.body.password;
+    try {
+        const result = await client.query('SELECT * FROM public.customers WHERE email=$1 AND password =$2;',[email ,password]);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Problem executing login, error: ', error);
+    }
 })
 
 app.get('/user', async (req, res) => {
@@ -50,9 +61,9 @@ app.get('/user', async (req, res) => {
 
 })
 
-app.patch('/user/:id', async (req, res) => {
-   
-
+app.patch('/user/:userId', async (req, res) => {
+   const userId = req.params.userId;
+   const request = req.body;
 })
 
 app.delete('/user/:userId', async (req, res) => {

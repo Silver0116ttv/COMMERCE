@@ -10,7 +10,7 @@ const API_URL = "http://localhost:4000/";
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const client = new Sequelize('world', 'postgres', 'Destripador123.', {
+const client = new Sequelize('database', 'postgres', 'password.', {
     host: 'localhost',
     dialect: 'postgres' /* one of 'mysql' |  | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
   });

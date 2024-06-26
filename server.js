@@ -13,10 +13,10 @@ app.use(bodyParser.json());
 
 const client = new pg.Client({
     user: 'postgres',
-    password: 'Destripador123.',
+    password: 'password.',
     host: 'localhost',
     port: 5432,
-    database: 'world',
+    database: 'database',
   });
   
   client

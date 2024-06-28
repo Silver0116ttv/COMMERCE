@@ -1,11 +1,12 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import pg from 'pg';
-import Sequelize from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+import {Sequelize} from 'sequelize';
 
 const app = express();
 const port = 4000;
-const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
+
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,10 +14,10 @@ app.use(bodyParser.json());
 
 const client = new pg.Client({
     user: 'postgres',
-    password: 'Destripador123.',
+    password: '12345.',
     host: 'localhost',
     port: 5432,
-    database: 'e-commerce',
+    database: 'database',
   });
   
   client
@@ -38,7 +39,7 @@ app.post('/signup', async (req, res) => {
     const email = req.body.email;
     try {
         const result = await client.query('INSERT INTO  public.customers(name, email, password) VALUES ($1,$2,$3) RETURNING *;',[name, email ,password]);
-        res.json(result.rows);
+        res.send(result.rows);
     } catch (error) {
         console.error('Problem executing signup, error: ', error);
     }

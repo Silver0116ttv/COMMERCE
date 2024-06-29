@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import pg from 'pg';
 import {Sequelize, Model, DataTypes} from 'sequelize';
+import { Json } from 'sequelize/lib/utils';
 
 const app = express();
 const port = 3000;
@@ -10,10 +11,13 @@ const API_URL = "http://localhost:4000/";
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const sequelize = new Sequelize('database', 'postgres', '123456.', {
+const sequelize = new Sequelize('name-database', 'postgres', 'contraseña', {
   host: 'localhost',
   dialect: 'postgres',
-  define: { freezeTableName: true }
+  define: { 
+    freezeTableName: true,
+    updatedAt: false
+   }
 });
 
 try {
@@ -39,7 +43,8 @@ Product.init(
   },
   {
     sequelize,
-    tableName:'product',
+    tableName:'products',
+    createdAt: false,
   },
 );
 
@@ -50,7 +55,7 @@ Order.init(
   },
   {
     sequelize,
-    tableName:'order',
+    tableName:'orders',
   },
 );
 
@@ -62,7 +67,8 @@ Customer.init(
   },
   {
     sequelize,
-    tableName:'customer',
+    tableName:'customers',
+    createdAt: false,
   },
 );
 
@@ -73,20 +79,22 @@ Payment.init(
   },
   {
     sequelize,
-    tableName:'payment',
+    tableName:'payments',
   },
 );
 
 Cart.init(
   {
-    user_id: {
+    customer_id: 
+    {
       type: DataTypes.INTEGER,
-      references: { model: Customer, key: 'user_id' }
+      references: { model: Customer, key: 'id' }
     },
   },
   {
     sequelize,
-    tableName:'cart',
+    tableName:'carts',
+    createdAt: false,
   },
 );
 
@@ -98,23 +106,37 @@ Category.init (
   },
   {
     sequelize,
-    tableName:'cart',
+    tableName:'categories',
+    createdAt: false,
   },
 );
 
 //User.sync({force: true}); //crea tabla si no existe y si existe no hace nada
 // User.sync({ force: true }); //crea tabla si no existe y si existe borra tabla y cre auna nueva, recrear tabla
 // User.sync({ alter: true }); //analiza todos los datos de la tabla y edita lo necesario  para matchear el modelo
-// await sequelize.sync() //'All models were synchronized successfully
-// await sequelize.drop(); //All tables dropped!
+//await sequelize.sync({ force: true }) //'All models were synchronized successfully
+//await sequelize.drop(); //All tables dropped!
 
 
-console.log(sequelize.models);
+//console.log(sequelize.models);
 // `sequelize.define` also returns the model
-console.log(Customer === sequelize.models.User); // true
-const user = Customer.build({ name: 'Daniel Moreno', email:'daniel.moreno99@gmail.com' });
+// console.log(Customer === sequelize.models.User); // true
+//const daniel = Customer.build({name:'Daniel Moreno'});
+
+// the name is still "Jane" in the database
+
+//const customers = await Customer.findAll(
+  //{
+   // attributes: ['name']
+  //}
+//);
+//console.log('All users: ', JSON.stringify(customers, null, 4));
+// the name is still "Jane" in the database
+//const instrumento = Category.build({name: 'Guitarra', picture:'guitarrafoto', description:'Guitarra negraa'});
+//ways to console.log sequelize instances
+//console.log(JSON.stringify(instrumento, null, 4));
 //console.log(user.toJSON());
-console.log(JSON.stringify(user, null, 4)); //me gusta mas este formato
+//console.log(JSON.stringify(user, null, 4)); //me gusta mas este formato
 
 //TODO
 /*investigar mas sobre UUID en base de datos y js

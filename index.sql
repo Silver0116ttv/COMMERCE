@@ -40,41 +40,99 @@ CREATE DATABASE name
            [ IS_TEMPLATE [=] istemplate ]
            [ OID [=] oid ]
 
-CREATE TABLE product (
-    P_ID INT PRIMARY KEY,
-    Name VARCHAR(255),
-    Price DECIMAL(10, 2),
-    Description TEXT
+-- Tabla de Usuarios
+CREATE TABLE usuarios (
+    usuario_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    contraseña VARCHAR(100) NOT NULL,
+    fecha_registro DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE order (
-    Order_ID INT PRIMARY KEY,
-    Order_Amount DECIMAL(10, 2),
-    Order_Date DATE
+-- Tabla de Direcciones
+CREATE TABLE direcciones (
+    direccion_id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    estado VARCHAR(100) NOT NULL,
+    codigo_postal VARCHAR(10) NOT NULL,
+    pais VARCHAR(100) NOT NULL,
+    tipo_direccion VARCHAR(50) NOT NULL, -- Envío o Facturación
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
 
-CREATE TABLE customer (
-    User_ID INT PRIMARY KEY,
-    Name VARCHAR(255),
-    Email VARCHAR(255),
-    Password VARCHAR(255)
+-- Tabla de Categorías
+CREATE TABLE categorias (
+    categoria_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE payment (
-    Payment_ID INT PRIMARY KEY,
-    Type VARCHAR(50),
-    Amount DECIMAL(10, 2)
+-- Tabla de Productos
+CREATE TABLE productos (
+    producto_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio NUMERIC(10, 2) NOT NULL,
+    stock INT NOT NULL,
+    categoria_id INT NOT NULL,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(categoria_id)
 );
 
-CREATE TABLE cart (
-    Cart_ID INT PRIMARY KEY,
-    User_ID INT,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID)
+-- Tabla de Carritos
+CREATE TABLE carritos (
+    carrito_id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    fecha_creacion DATE NOT NULL DEFAULT CURRENT_DATE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
 
-CREATE TABLE category (
-    C_ID INT PRIMARY KEY,
-    Name VARCHAR(255),
-    Picture VARCHAR(255),
-    Description TEXT
+-- Tabla intermedia Carrito_Productos
+CREATE TABLE carrito_productos (
+    carrito_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (carrito_id, producto_id),
+    FOREIGN KEY (carrito_id) REFERENCES carritos(carrito_id),
+    FOREIGN KEY (producto_id) REFERENCES productos(producto_id)
+);
+
+-- Tabla de Pedidos
+CREATE TABLE pedidos (
+    pedido_id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    direccion_id INT NOT NULL,
+    fecha_pedido DATE NOT NULL DEFAULT CURRENT_DATE,
+    total NUMERIC(10, 2) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    metodo_pago VARCHAR(100) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
+    FOREIGN KEY (direccion_id) REFERENCES direcciones(direccion_id)
+);
+
+-- Tabla intermedia Pedido_Productos
+CREATE TABLE pedido_productos (
+    pedido_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio NUMERIC(10, 2) NOT NULL,
+    PRIMARY KEY (pedido_id, producto_id),
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(pedido_id),
+    FOREIGN KEY (producto_id) REFERENCES productos(producto_id)
+);
+
+-- Tabla de Métodos de Pago
+CREATE TABLE metodos_pago (
+    metodo_pago_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT
+);
+
+-- Relación de Métodos de Pago y Pedidos
+CREATE TABLE pedido_metodos_pago (
+    pedido_id INT NOT NULL,
+    metodo_pago_id INT NOT NULL,
+    PRIMARY KEY (pedido_id, metodo_pago_id),
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(pedido_id),
+    FOREIGN KEY (metodo_pago_id) REFERENCES metodos_pago(metodo_pago_id)
 );

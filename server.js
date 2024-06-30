@@ -1,8 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import pg from 'pg';
 import { v4 as uuidv4 } from 'uuid';
+import pg from 'pg';
 import {Sequelize} from 'sequelize';
+
 
 const app = express();
 const port = 4000;
@@ -12,22 +13,22 @@ const port = 4000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const client = new pg.Client({
-    user: 'postgres',
-    password: '12345.',
+const sequelize = new Sequelize('e-commerce', 'postgres', 'Destripador123.', {
     host: 'localhost',
-    port: 5432,
-    database: 'database',
+    dialect: 'postgres', /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
+    define: { 
+      freezeTableName: true,
+      updatedAt: false
+     }
   });
   
-  client
-  .connect()
-  .then(() => {
-      console.log('Connected to PostgreSQL database');
-  })
-  .catch((err) => {
-      console.error('Error connecting to PostgreSQL database', err);
-  });
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+    
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  };
 
  app.get('/', (req, res) => {
     res.sendStatus(200);
@@ -38,8 +39,7 @@ app.post('/signup', async (req, res) => {
     const password = req.body.password;
     const email = req.body.email;
     try {
-        const result = await client.query('INSERT INTO  public.customers(name, email, password) VALUES ($1,$2,$3) RETURNING *;',[name, email ,password]);
-        res.send(result.rows);
+        const user = await sequelize.create()
     } catch (error) {
         console.error('Problem executing signup, error: ', error);
     }

@@ -1,8 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import pg from 'pg';
-import {Sequelize, Model, DataTypes} from 'sequelize';
-import { Json } from 'sequelize/lib/utils';
+import {Sequelize, Model, DataTypes, Deferrable } from 'sequelize';
 
 const app = express();
 const port = 3000;
@@ -11,11 +9,10 @@ const API_URL = "http://localhost:4000/";
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const sequelize = new Sequelize('name-database', 'postgres', 'contraseña', {
+const sequelize = new Sequelize('e-commerce', 'postgres', 'Destripador123.', {
   host: 'localhost',
-  dialect: 'postgres',
+  dialect: 'postgres', /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
   define: { 
-    freezeTableName: true,
     updatedAt: false
    }
 });
@@ -28,36 +25,14 @@ try {
   console.error('Unable to connect to the database:', error);
 };
 
+class Customer extends Model {};
+class Address extends Model {};
+class Category extends Model {};
 class Product extends Model{};
 class Order extends Model {};
-class Customer extends Model {};
 class Payment extends Model {};
 class Cart extends Model {};
-class Category extends Model {};
-
-Product.init(
-  {
-    name:        DataTypes.STRING(45),
-    Price:       DataTypes.DECIMAL(10, 2),
-    Description: DataTypes.TEXT,
-  },
-  {
-    sequelize,
-    tableName:'products',
-    createdAt: false,
-  },
-);
-
-Order.init(
-  {
-    order_amount: DataTypes.STRING(45),
-    order_date:   DataTypes.DATE,
-  },
-  {
-    sequelize,
-    tableName:'orders',
-  },
-);
+class Products_Cart extends Model{};
 
 Customer.init(
   {
@@ -68,7 +43,96 @@ Customer.init(
   {
     sequelize,
     tableName:'customers',
+  },
+);
+
+Address.init (
+  {
+    customer_id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: Customer, key: 'id'},
+    },
+    address: {
+      type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    state: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    postal_code: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    }
+  },
+  {
+    sequelize,
+    tableName:'addresses'
+  },
+)
+
+Category.init (
+  {
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull:false
+    }
+  },
+  {
+    sequelize,
     createdAt: false,
+    tableName:'categories'
+  },
+);
+
+Product.init(
+  {
+    name: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    Description: DataTypes.TEXT,
+    Price: DataTypes.DECIMAL(10, 2),
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    category_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Category, 
+        key:'id',
+      },
+    },
+    
+  },
+  {
+    sequelize,
+    createdAt: false,
+    tableName:'products'
+  },
+);
+
+Order.init(
+  {
+    order_amount: DataTypes.STRING(45),
+    order_date:   {
+      type: DataTypes.DATE,
+      allowNull:false
+    },
+    order_by_id: {
+      type: DataTypes.INTEGER,
+      references: { model: Customer, key: 'id'},
+    }
+  },
+  {
+    sequelize,
   },
 );
 
@@ -79,7 +143,6 @@ Payment.init(
   },
   {
     sequelize,
-    tableName:'payments',
   },
 );
 
@@ -93,23 +156,36 @@ Cart.init(
   },
   {
     sequelize,
-    tableName:'carts',
-    createdAt: false,
   },
 );
 
-Category.init (
+Products_Cart.init(
   {
-    name:         DataTypes.STRING(45),
-    picture:      DataTypes.STRING(45),
-    description:  DataTypes.TEXT,
-  },
+    cart_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: { model: Cart, key: 'id' }
+    },
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: { model: Product, key: 'id' }
+    },
+    quant: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    }
+  }, 
   {
     sequelize,
-    tableName:'categories',
-    createdAt: false,
+    tableName:'products_cart'
   },
-);
+)
+
+
 
 //User.sync({force: true}); //crea tabla si no existe y si existe no hace nada
 // User.sync({ force: true }); //crea tabla si no existe y si existe borra tabla y cre auna nueva, recrear tabla
@@ -118,7 +194,7 @@ Category.init (
 //await sequelize.drop(); //All tables dropped!
 
 
-//console.log(sequelize.models);
+console.log(sequelize.models);
 // `sequelize.define` also returns the model
 // console.log(Customer === sequelize.models.User); // true
 //const daniel = Customer.build({name:'Daniel Moreno'});

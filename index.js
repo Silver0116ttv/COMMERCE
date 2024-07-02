@@ -1,10 +1,4 @@
-import express from 'express';
 import {Sequelize, Model, DataTypes, Deferrable } from 'sequelize';
-
-const app = express();
-const port = 3000;
-const API_URL = "http://localhost:4000/";
-
 
 const sequelize = new Sequelize('e-commerce', 'postgres', 'Destripador123.', {
   host: 'localhost',
@@ -22,7 +16,9 @@ try {
   console.error('Unable to connect to the database:', error);
 };
 
-class Customer extends Model {};
+class Customer extends Model {
+  
+};
 class Address extends Model {};
 class Category extends Model {};
 class Product extends Model{};
@@ -188,11 +184,11 @@ Products_Cart.init(
 //User.sync({force: true}); //crea tabla si no existe y si existe no hace nada
 // User.sync({ force: true }); //crea tabla si no existe y si existe borra tabla y cre auna nueva, recrear tabla
 // User.sync({ alter: true }); //analiza todos los datos de la tabla y edita lo necesario  para matchear el modelo
-await sequelize.sync({ force: true }) //'All models were synchronized successfully
+//await sequelize.sync({ force: true }) //'All models were synchronized successfully
 //await sequelize.drop(); //All tables dropped!
 
 
-console.log(sequelize.models);
+//console.log(sequelize.models);
 // `sequelize.define` also returns the model
 // console.log(Customer === sequelize.models.User); // true
 //const daniel = Customer.build({name:'Daniel Moreno'});
@@ -216,3 +212,6 @@ console.log(sequelize.models);
 /*investigar mas sobre UUID en base de datos y js
 invetigar  mas sobre sequelized
 postgresql*/
+
+
+export {Customer, Address, Category, Product, Order, Payment, Cart, Products_Cart};

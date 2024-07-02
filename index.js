@@ -1,13 +1,10 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import {Sequelize, Model, DataTypes, Deferrable } from 'sequelize';
 
 const app = express();
 const port = 3000;
 const API_URL = "http://localhost:4000/";
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 
 const sequelize = new Sequelize('e-commerce', 'postgres', 'Destripador123.', {
   host: 'localhost',
@@ -187,10 +184,11 @@ Products_Cart.init(
 
 
 
+
 //User.sync({force: true}); //crea tabla si no existe y si existe no hace nada
 // User.sync({ force: true }); //crea tabla si no existe y si existe borra tabla y cre auna nueva, recrear tabla
 // User.sync({ alter: true }); //analiza todos los datos de la tabla y edita lo necesario  para matchear el modelo
-//await sequelize.sync({ force: true }) //'All models were synchronized successfully
+await sequelize.sync({ force: true }) //'All models were synchronized successfully
 //await sequelize.drop(); //All tables dropped!
 
 

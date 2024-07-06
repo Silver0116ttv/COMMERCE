@@ -1,5 +1,8 @@
 import {Sequelize, Model, DataTypes, Deferrable } from 'sequelize';
 
+
+
+
 const sequelize = new Sequelize('e-commerce', 'postgres', 'Destripador123.', {
   host: 'localhost',
   dialect: 'postgres', /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
@@ -29,9 +32,21 @@ class Products_Cart extends Model{};
 
 Customer.init(
   {
-    name:     DataTypes.STRING(45),
-    email:    DataTypes.STRING(255),
-    password: DataTypes.STRING(25),
+    username:     {
+      type: DataTypes.STRING(45),
+      unique: true
+    },
+    email:    {
+      type: DataTypes.STRING(255),
+      unique: true
+    },
+    password: {
+      type: DataTypes.STRING(100),
+      set(value) {
+      // Using the username as a salt
+        this.setDataValue('password', hash(this.username + value));
+      }
+    },
   },
   {
     sequelize,
@@ -126,6 +141,7 @@ Order.init(
   },
   {
     sequelize,
+    tableName:'orders'
   },
 );
 
@@ -136,6 +152,7 @@ Payment.init(
   },
   {
     sequelize,
+    tableName:'payments'
   },
 );
 
@@ -149,6 +166,7 @@ Cart.init(
   },
   {
     sequelize,
+    tableName:'carts'
   },
 );
 
@@ -174,7 +192,7 @@ Products_Cart.init(
   }, 
   {
     sequelize,
-    tableName:'products_cart'
+    tableName:'products_carts'
   },
 )
 
@@ -212,6 +230,8 @@ Products_Cart.init(
 /*investigar mas sobre UUID en base de datos y js
 invetigar  mas sobre sequelized
 postgresql*/
+
+
 
 
 export {Customer, Address, Category, Product, Order, Payment, Cart, Products_Cart};

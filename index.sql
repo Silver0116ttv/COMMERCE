@@ -1,7 +1,7 @@
-CREATE ROLE RamonHernandez WITH
-    PASSWORD 'Ramon4321'
-    NOSUPERUSER
-    CREATEDB
+CREATE USER nombre_usuario WITH PASSWORD 'contraseña_segura';
+GRANT CONNECT ON DATABASE nombre_base_datos TO nombre_usuario;
+GRANT ALL PRIVILEGES ON DATABASE nombre_base_datos TO nombre_usuario;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO nombre_usuario;
 
 where option can be:
 

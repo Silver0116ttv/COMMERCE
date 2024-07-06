@@ -38,12 +38,21 @@ app.post('/login', async (req, res) => {
     const password = req.body.password;
     const username = req.body.username;
     
-        if(await verifyLogin(username, password)){
-            const user = await Customer.findOne({ where: { username } });
-        res.status(200).send(JSON.stringify(user, null, 2))
-        }else {
+    try {
+        const user = await Customer.findOne({ where: { username },  });
+        if (!user) {
             return false;
         }
+        const hashedPassword = hash(username + password);
+        if (hashedPassword === user.password) {
+            res.status(200).send(JSON.stringify(user, null, 2))
+        } else {
+            res.send(JSON.stringify('Username or password wrong please try again'))
+        }
+    } catch (error) {
+        console.error('Error verifying el login:', error);
+        return false;
+    }
     
 
 })
@@ -99,22 +108,5 @@ console.log(`Example app listening on port ${port}`)
   
 
 async function verifyLogin(username, password) {
-    try {
-        // Buscar el usuario por nombre de usuario
-        const user = await Customer.findOne({ where: { username } });
-        if (!user) {
-            return false; // Usuario no encontrado
-        }
-
-        // Comparar la contraseña proporcionada con la almacenada
-        const hashedPassword = hash(username + password);
-        if (hashedPassword === user.password) {
-            return true; // Contraseña correcta
-        } else {
-            return false; // Contraseña incorrecta
-        }
-    } catch (error) {
-        console.error('Error verificando el login:', error);
-        return false;
-    }
+    
 }

@@ -14,15 +14,11 @@ User.init(
       unique: true
     },
     password: {
-      type: DataTypes.STRING(100),
-      set(value) {
-      // Using the username as a salt
-        this.setDataValue('password', hash(this.username + value));
-      }
+      type: DataTypes.STRING(100)
     },
   },
   {
     sequelize,
-    tableName:'customers',
+    tableName:'users',
   },
 );

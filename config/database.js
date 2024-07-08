@@ -1,6 +1,9 @@
 import Sequelize from 'sequelize';
+import env from 'dotenv';
 
-export const sequelize = new Sequelize('e-commerce', 'postgres', 'password1234.', {
+env.config();
+
+export const sequelize = new Sequelize('e-commerce', 'postgres', process.env.DB_PASSWORD, {
     host: 'localhost',
     dialect: 'postgres', /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
     define: { 

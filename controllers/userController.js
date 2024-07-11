@@ -62,7 +62,7 @@ export const loginUser =  passport.authenticate("local", {
 
 export const isAuth = (req, res) => {
   if(req.isAuthenticated()){
-    res.render('index.ejs')
+    res.render('index')
   } else {
     res.redirect('/users/register');
   }
@@ -103,6 +103,8 @@ passport.use("local",
     })
   );
 
+//--------------------------------------------
+  
   passport.use(
     "google", 
     new GoogleStrategy(

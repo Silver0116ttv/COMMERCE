@@ -2,6 +2,10 @@ import { User } from '../models/userModel.js';
 import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
+import GoogleStrategy from "passport-google-oauth2";
+import env from "dotenv";
+
+env.config();
 
 const saltRounds = 10;
 
@@ -47,10 +51,10 @@ export const showLoginForm = (req, res) => {
   res.render('login.ejs');
 }
 
-
+//--------------------------------------------
 
 export const loginUser =  passport.authenticate("local", {
-  successRedirect: "/",
+  successRedirect: "/users/home",
   failureRedirect: "/users/login",
 })
   
@@ -66,9 +70,10 @@ export const isAuth = (req, res) => {
   
 //--------------------------------------------
 
+export const loginGoogle = passport.authenticate("google", { scope: ["profile", "email"], });
 
 
-  passport.use(
+passport.use("local",
     new Strategy(async function verify(username, password, cb) {
       try {
         const user = await User.findOne({ where: { username: username },  });
@@ -97,11 +102,29 @@ export const isAuth = (req, res) => {
       }
     })
   );
-  
-  passport.serializeUser((user, cb) => {
-    cb(null, user);
-  });
 
-  passport.deserializeUser((user, cb) => {
-    cb(null, user);
-  });
+  passport.use(
+    "google", 
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "http://localhost:3000/auth/google/secrets",
+        userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfoqESRD3WAQC",
+      },
+      async(accessToken,refreshToken, profile, cb) => {
+    try {
+      console.log(profile);
+      const user = User.findOne({where: {email: profile.email}})
+      if (!user) {
+        const newUser = User.create({username: profile.displayName, email: profile.email, password: 'google'})
+        return cb(null, newUser);
+      } else {
+        return cb(null, user);
+      }
+    } catch (err) {
+      return cb(err);
+    }
+  }
+)
+);

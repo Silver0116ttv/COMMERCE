@@ -1,7 +1,7 @@
 {
   "name": "db-api-e-coomerce",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,15 +16,17 @@
     "body-parser": "^1.20.2",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.9",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",
     "express-session": "^1.18.0",
     "passport": "^0.7.0",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-google-oidc": "^0.1.0",
     "passport-local": "^1.0.0",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
-    "uuid": "^10.0.0",
-    "ejs": "^3.1.9"
+    "uuid": "^10.0.0"
   }
 }

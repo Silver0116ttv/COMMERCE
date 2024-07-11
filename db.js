@@ -21,7 +21,7 @@ try {
   console.error('Unable to connect to the database:', error);
 };
 
-class Customer extends Model {};
+class User extends Model {};
 class Address extends Model {};
 class Category extends Model {};
 class Product extends Model{}; //post
@@ -30,7 +30,7 @@ class Payment extends Model {};
 class Cart extends Model {};
 class Products_Cart extends Model{};
 
-Customer.init(
+User.init(
   {
     username:     {
       type: DataTypes.STRING(45),
@@ -50,7 +50,7 @@ Customer.init(
   },
   {
     sequelize,
-    tableName:'customers',
+    tableName:'users',
   },
 );
 
@@ -197,6 +197,13 @@ Products_Cart.init(
 )
 
 
+// create an initialize user (username: alice, password: letmein)
+const newUser = User.build({
+  username: 'Daniel Moreno', 
+  email:'daniel.alsar99@gmail.com',
+  password: 'Password1234.',
+})
+//newUser.save(); 
 
 
 //User.sync({force: true}); //crea tabla si no existe y si existe no hace nada
@@ -234,4 +241,4 @@ postgresql*/
 
 
 
-export {Customer, Address, Category, Product, Order, Payment, Cart, Products_Cart};
+

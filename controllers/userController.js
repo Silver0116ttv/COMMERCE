@@ -56,8 +56,19 @@ export const showLoginForm = (req, res) => {
 export const loginUser =  passport.authenticate("local", {
   successRedirect: "/users/home",
   failureRedirect: "/users/login",
-})
-  
+});
+
+//--------------------------------------------
+
+export const loginGoogle = passport.authenticate("google", { scope: ["profile", "email"], });
+
+//--------------------------------------------
+
+export const authPassport = passport.authenticate("google", {
+  successRedirect: "/",
+  failureRedirect: "users/register",
+});
+
 //--------------------------------------------
 
 export const isAuth = (req, res) => {
@@ -67,16 +78,13 @@ export const isAuth = (req, res) => {
     res.redirect('/users/register');
   }
 }
-  
+ 
 //--------------------------------------------
-
-export const loginGoogle = passport.authenticate("google", { scope: ["profile", "email"], });
-
 
 passport.use("local",
     new Strategy(async function verify(username, password, cb) {
       try {
-        const user = await User.findOne({ where: { username: username },  });
+        const user = await User.findOne( { where: { username: username } } );
         if (user) {
           const storedHashedPassword = user.password;
           bcrypt.compare(password, storedHashedPassword, (err, result) => {
@@ -111,15 +119,15 @@ passport.use("local",
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/auth/google/secrets",
+        callbackURL: "http://localhost:3000/users/oauth2/redirect/google",
         userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfoqESRD3WAQC",
       },
       async(accessToken,refreshToken, profile, cb) => {
     try {
-      console.log(profile);
-      const user = User.findOne({where: {email: profile.email}})
+      const user = await User.findOne({where: {email: profile.email}});
+      console.log(user);
       if (!user) {
-        const newUser = User.create({username: profile.displayName, email: profile.email, password: 'google'})
+        const newUser = await User.create({username: profile.displayName, email: profile.email, password: "google"});
         return cb(null, newUser);
       } else {
         return cb(null, user);
@@ -130,3 +138,11 @@ passport.use("local",
   }
 )
 );
+
+passport.serializeUser((user, cb) => {
+  cb(null, user);
+});
+passport.deserializeUser((user, cb) => {
+  cb(null, user);
+});
+

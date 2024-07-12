@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { sequelize } from './config/database.js';
-import userRoutes from './routes/userRoutes.js';
 import session from "express-session";
 import passport from "passport";
 import env from "dotenv";
@@ -33,18 +32,16 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.set('view engine', 'ejs');
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', indexRouter);
-
-
 
 
 
